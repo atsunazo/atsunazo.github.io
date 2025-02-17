@@ -14,7 +14,6 @@
             width: 100%;
             height: 100%;
             overflow: hidden;
-            -webkit-text-size-adjust: 100%;
         }
         
         #quiz-container {
@@ -57,26 +56,14 @@
             font-weight: bold;
             margin-top: 10px;
         }
-
-        #leaderboard {
-            margin-top: 20px;
-        }
-
-        #leaderboard ol {
-            padding-left: 20px;
-        }
     </style>
 </head>
 <body>
+    <h1 id="game-title">謎解きタイムアタック</h1>
     <div id="quiz-container">
-        <h1>謎解きタイムアタック</h1>
         <div id="start-screen">
             <input type="text" id="name-input" placeholder="名前を入力してください">
             <button id="start-btn">開始</button>
-            <div id="leaderboard">
-                <h2>ランキング</h2>
-                <ol id="leaderboard-list"></ol>
-            </div>
         </div>
         <div id="quiz-screen" style="display: none;">
             <div id="timer">経過時間: 00:00</div>
@@ -97,6 +84,13 @@
     </div>
 
     <script>
+        window.addEventListener('resize', function() {
+            if (document.activeElement.tagName === 'INPUT' || document.activeElement.tagName === 'TEXTAREA') {
+                window.setTimeout(function() {
+                    document.activeElement.scrollIntoView();
+                }, 0);
+            }
+        });
         const questions = [
             { image: './quiz1.png', text: '問題1のテキスト', answer: 'a' },
             { image: './quiz2.png', text: '問題2のテキスト', answer: 'b' },
@@ -110,6 +104,7 @@
         let solvedQuestions = new Set();
         let playerName = '';
 
+        const gameTitle = document.getElementById('game-title');
         const startScreen = document.getElementById('start-screen');
         const quizScreen = document.getElementById('quiz-screen');
         const finishScreen = document.getElementById('finish-screen');
@@ -126,35 +121,13 @@
         const finishResult = document.getElementById('finish-result');
         const commentInput = document.getElementById('comment-input');
         const submitCommentBtn = document.getElementById('submit-comment-btn');
-        const leaderboardList = document.getElementById('leaderboard-list');
-
-        function displayLeaderboard() {
-            const leaderboard = JSON.parse(localStorage.getItem('leaderboard')) || [];
-            leaderboardList.innerHTML = leaderboard.map((entry, index) => 
-                `<li>${entry.name} - ${entry.time} (${entry.rank})</li>`
-            ).join('');
-        }
-
-        function saveToLeaderboard(name, time, rank) {
-            let leaderboard = JSON.parse(localStorage.getItem('leaderboard')) || [];
-            leaderboard.push({ name, time, rank });
-            leaderboard.sort((a, b) => {
-                const [aMin, aSec] = a.time.split(':').map(Number);
-                const [bMin, bSec] = b.time.split(':').map(Number);
-                return (aMin * 60 + aSec) - (bMin * 60 + bSec);
-            });
-            leaderboard = leaderboard.slice(0, 10);
-            localStorage.setItem('leaderboard', JSON.stringify(leaderboard));
-            displayLeaderboard();
-        }
-
-        window.addEventListener('load', displayLeaderboard);
 
         startBtn.addEventListener('click', () => {
             playerName = nameInput.value.trim();
             if (playerName) {
                 startScreen.style.display = 'none';
                 quizScreen.style.display = 'block';
+                gameTitle.style.display = 'none';
                 startQuiz();
             } else {
                 alert('名前を入力してください。');
@@ -236,7 +209,6 @@
                 <p>タイム: ${finalTime}</p>
                 <p class="rank">ランク: ${rank}</p>
             `;
-            saveToLeaderboard(playerName, finalTime, rank);
         }
 
         submitCommentBtn.addEventListener('click', () => {
@@ -257,16 +229,8 @@
             commentInput.value = '';
             finishScreen.style.display = 'none';
             startScreen.style.display = 'block';
-            displayLeaderboard();
+            gameTitle.style.display = 'block';
         }
-
-        window.addEventListener('resize', function() {
-            if (document.activeElement.tagName === 'INPUT' || document.activeElement.tagName === 'TEXTAREA') {
-                window.setTimeout(function() {
-                    document.activeElement.scrollIntoView();
-                }, 0);
-            }
-        });
     </script>
 </body>
 </html>
