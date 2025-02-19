@@ -121,39 +121,42 @@
         const commentInput = document.getElementById('comment-input');
         const submitCommentBtn = document.getElementById('submit-comment-btn');
 
-        // スプレッドシートに記録を保存する関数
         function saveRecord(name, time, rank) {
             var gasUrl = "https://script.google.com/macros/s/AKfycbz6mVCgN0sI-EAVAcdHLbpWpe2MxF-HZCeziijRJCHV7vQW-QnvzCwuhxeDXkhCG1nrPw/exec";
-        
-            fetch(gasUrl + "?action=saveRecord&name=" + encodeURIComponent(name) + "&time=" + encodeURIComponent(time) + "&rank=" + encodeURIComponent(rank), {
-                method: 'GET',
-                mode: 'no-cors'
+
+            fetch(gasUrl, {
+                method: 'POST',
+                mode: 'no-cors',
+                headers: {
+                'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                action: 'saveRecord',
+                name: name,
+                time: time,
+                rank: rank
+                })
             })
             .then(response => {
-                console.log('記録が保存されました');
+                console.log('記録が保存されました:');
             })
             .catch(error => console.error('記録の保存に失敗しました:', error));
         }
 
+        function displayLeaderboard() {
+            var gasUrl = "YOUR_GAS_URL";
 
-        // ランキングを取得して表示する関数
-              function displayLeaderboard() {
-            var gasUrl = "https://script.google.com/macros/s/AKfycbz6mVCgN0sI-EAVAcdHLbpWpe2MxF-HZCeziijRJCHV7vQW-QnvzCwuhxeDXkhCG1nrPw/exec";
-        
             fetch(gasUrl + "?action=getLeaderboard")
-                .then(response => response.text())
+                .then(response => response.json())
                 .then(data => {
-                    const leaderboard = JSON.parse(data);
                     const leaderboardList = document.getElementById('leaderboard-list');
-                    leaderboardList.innerHTML = leaderboard.map((entry, index) => {
-                        return `<li>${entry[0]} - ${entry[1]} (${entry[2]})</li>`;
+                    leaderboardList.innerHTML = data.map((entry, index) => {
+                        return `<li>${entry.name} - ${entry.time} (${entry.rank})</li>`;
                     }).join('');
                 })
                 .catch(error => console.error('ランキングの取得に失敗しました:', error));
         }
 
-
-        // ページ読み込み時にリーダーボードを表示
         window.addEventListener('load', displayLeaderboard);
 
         startBtn.addEventListener('click', () => {
@@ -248,7 +251,6 @@
         submitCommentBtn.addEventListener('click', () => {
             const comment = commentInput.value.trim();
             if (comment) {
-                // ここでコメントを記録する処理を追加（例：サーバーに送信など）
                 console.log('記録されたコメント:', comment);
                 resetQuiz();
             } else {
