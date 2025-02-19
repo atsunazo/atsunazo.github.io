@@ -59,8 +59,8 @@
     </style>
 </head>
 <body>
-    <h1 id="game-title">謎解きタイムアタック</h1>
     <div id="quiz-container">
+        <h1>謎解きタイムアタック</h1>
         <div id="start-screen">
             <input type="text" id="name-input" placeholder="名前を入力してください">
             <button id="start-btn">開始</button>
@@ -87,7 +87,7 @@
         window.addEventListener('resize', function() {
             if (document.activeElement.tagName === 'INPUT' || document.activeElement.tagName === 'TEXTAREA') {
                 window.setTimeout(function() {
-                    document.activeElement.scrollIntoView();
+            document.activeElement.scrollIntoView();
                 }, 0);
             }
         });
@@ -104,7 +104,6 @@
         let solvedQuestions = new Set();
         let playerName = '';
 
-        const gameTitle = document.getElementById('game-title');
         const startScreen = document.getElementById('start-screen');
         const quizScreen = document.getElementById('quiz-screen');
         const finishScreen = document.getElementById('finish-screen');
@@ -122,12 +121,57 @@
         const commentInput = document.getElementById('comment-input');
         const submitCommentBtn = document.getElementById('submit-comment-btn');
 
+        // スプレッドシートに記録を保存する関数
+        function saveRecord(name, time, rank) {
+            // GASのURLを設定
+            var gasUrl = "https://script.google.com/macros/s/AKfycbz6mVCgN0sI-EAVAcdHLbpWpe2MxF-HZCeziijRJCHV7vQW-QnvzCwuhxeDXkhCG1nrPw/exec";
+
+            // 記録を送信
+            fetch(gasUrl, {
+                method: 'POST',
+                mode: 'no-cors',
+                headers: {
+                'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                action: 'saveRecord',
+                name: name,
+                time: time,
+                rank: rank
+                })
+            })
+            .then(response => {
+                console.log('記録が保存されました:');
+            })
+            .catch(error => console.error('記録の保存に失敗しました:', error));
+        }
+
+        // ランキングを取得して表示する関数
+        function displayLeaderboard() {
+            // GASのURLを設定
+            var gasUrl = "YOUR_GAS_URL";
+
+            // ランキングを取得
+            fetch(gasUrl + "?action=getLeaderboard")
+                .then(response => response.json())
+                .then(data => {
+                    // ランキングを表示
+                    const leaderboardList = document.getElementById('leaderboard-list');
+                    leaderboardList.innerHTML = data.map((entry, index) => {
+                        return `<li>${entry.name} - ${entry.time} (${entry.rank})</li>`;
+                    }).join('');
+                })
+                .catch(error => console.error('ランキングの取得に失敗しました:', error));
+        }
+
+        // ページ読み込み時にリーダーボードを表示
+        window.addEventListener('load', displayLeaderboard);
+
         startBtn.addEventListener('click', () => {
             playerName = nameInput.value.trim();
             if (playerName) {
                 startScreen.style.display = 'none';
                 quizScreen.style.display = 'block';
-                gameTitle.style.display = 'none';
                 startQuiz();
             } else {
                 alert('名前を入力してください。');
@@ -209,11 +253,13 @@
                 <p>タイム: ${finalTime}</p>
                 <p class="rank">ランク: ${rank}</p>
             `;
+            saveRecord(playerName, finalTime, rank);
         }
 
         submitCommentBtn.addEventListener('click', () => {
             const comment = commentInput.value.trim();
             if (comment) {
+                // ここでコメントを記録する処理を追加（例：サーバーに送信など）
                 console.log('記録されたコメント:', comment);
                 alert('コメントが記録されました。ありがとうございます！');
                 resetQuiz();
@@ -229,7 +275,7 @@
             commentInput.value = '';
             finishScreen.style.display = 'none';
             startScreen.style.display = 'block';
-            gameTitle.style.display = 'block';
+            displayLeaderboard();
         }
     </script>
 </body>
