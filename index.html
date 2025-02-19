@@ -123,28 +123,18 @@
 
         // スプレッドシートに記録を保存する関数
         function saveRecord(name, time, rank) {
-            // GASのURLを設定
             var gasUrl = "https://script.google.com/macros/s/AKfycbz6mVCgN0sI-EAVAcdHLbpWpe2MxF-HZCeziijRJCHV7vQW-QnvzCwuhxeDXkhCG1nrPw/exec";
-
-            // 記録を送信
-            fetch(gasUrl, {
-                method: 'POST',
-                mode: 'no-cors',
-                headers: {
-                'Content-Type': 'application/json'
-                },
-                body: JSON.stringify({
-                action: 'saveRecord',
-                name: name,
-                time: time,
-                rank: rank
-                })
+        
+            fetch(gasUrl + "?action=saveRecord&name=" + encodeURIComponent(name) + "&time=" + encodeURIComponent(time) + "&rank=" + encodeURIComponent(rank), {
+                method: 'GET',
+                mode: 'no-cors'
             })
             .then(response => {
-                console.log('記録が保存されました:');
+                console.log('記録が保存されました');
             })
             .catch(error => console.error('記録の保存に失敗しました:', error));
         }
+
 
         // ランキングを取得して表示する関数
         function displayLeaderboard() {
