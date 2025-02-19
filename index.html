@@ -228,9 +228,9 @@
             const totalSeconds = minutes * 60 + seconds;
             
             if (totalSeconds <= 60) return 'S';
-            if (totalSeconds <= 120) return 'A';
+            if (totalSeconds <= 150) return 'A';
             if (totalSeconds <= 240) return 'B';
-            if (totalSeconds <= 600) return 'C';
+            if (totalSeconds <= 420) return 'C';
             return 'D';
         }
 
