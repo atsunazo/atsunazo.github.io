@@ -46,7 +46,16 @@
     <footer>
         <p>© 2025 ひらがな練習. All rights reserved.</p>
     </footer>
-
+    <div className="w-full mb-6 flex items-center justify-center">
+      <IKImage
+        urlEndpoint={urlEndpoint}
+        path={getQuizImagePath(currentQuestionId)}
+        alt={`問題 ${currentQuestionId}`}
+        className="w-full object-contain"
+        loading="eager"
+      />
+    </div>
+    
     <script>
         const hiraganaGrid = [
             ["あ", "い", "う", "え", "お"],
