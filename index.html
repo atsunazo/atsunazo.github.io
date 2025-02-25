@@ -61,21 +61,23 @@
         .hiragana-grid {
             display: flex;
             flex-direction: row-reverse;
-            gap: 3px;
+            gap: 1.5px; /* ギャップを小さく */
             width: calc(100% - 1px);
+            margin: 10px auto; /* 中央寄せ */
         }
         .hiragana-column {
             display: flex;
             flex-direction: column;
-            gap: 3px;
+            gap: 1.5px; /* ギャップを小さく */
             flex: 1;
         }
         .hiragana-button {
             width: 100%;
             aspect-ratio: 1;
-            font-size: 14px;
-            border-radius: 4px;
+            font-size: 7px; /* フォントサイズを小さく */
+            border-radius: 2px; /* 角を小さく */
             border: 1px solid #e2e8f0;
+            padding: 0; /* パディングをなくす */
         }
     </style>
 </head>
@@ -94,7 +96,7 @@
             </div>
             <div id="hiragana-grid" class="hiragana-grid"></div>
             <input type="text" id="answer-input" placeholder="回答を入力">
-            <button id="submit-button">送信</button>
+            <button id="submit-btn">送信</button>
             <button id="back-btn">戻る</button>
             <p id="result-message"></p>
         </div>
@@ -125,7 +127,7 @@
         let answers = [];
         let solvedQuestions = new Set();
         let playerName = '';
-        let isSubmitting = false; // 多重送信を防ぐ
+        let isSubmitting = false;
 
         const startScreen = document.getElementById('start-screen');
         const quizScreen = document.getElementById('quiz-screen');
@@ -136,6 +138,7 @@
         const questionImage = document.getElementById('question-image');
         const questionText = document.getElementById('question-text');
         const answerInput = document.getElementById('answer-input');
+        const submitBtn = document.getElementById('submit-btn');
         const backBtn = document.getElementById('back-btn');
         const resultMessage = document.getElementById('result-message');
         const timerDisplay = document.getElementById('timer');
@@ -209,7 +212,7 @@
         }
 
         function saveRecord(name, time, rank) {
-            var gasUrl = "YOUR_GAS_URL";
+            var gasUrl = "https://script.google.com/macros/s/AKfycbz6mVCgN0sI-EAVAcdHLbpWpe2MxF-HZCeziijRJCHV7vQW-QnvzCwuhxeDXkhCG1nrPw/exec";
 
             fetch(gasUrl, {
                 method: 'POST',
@@ -231,7 +234,7 @@
         }
 
         function displayLeaderboard() {
-            var gasUrl = "YOUR_GAS_URL";
+            var gasUrl = "https://script.google.com/macros/s/AKfycbz6mVCgN0sI-EAVAcdHLbpWpe2MxF-HZCeziijRJCHV7vQW-QnvzCwuhxeDXkhCG1nrPw/exec";
 
             fetch(gasUrl + "?action=getLeaderboard")
                 .then(response => response.json())
@@ -252,7 +255,7 @@
                 startScreen.style.display = 'none';
                 quizScreen.style.display = 'block';
                 startQuiz();
-                initializeHiraganaGrid(); // ひらがなグリッド初期化
+                initializeHiraganaGrid();
             } else {
                 alert('名前を入力してください。');
             }
@@ -309,6 +312,8 @@
             isSubmitting = false;
         }
 
+        submitBtn.addEventListener('click', handleSubmit);
+
         backBtn.addEventListener('click', () => {
             if (currentQuestion > 0) {
                 currentQuestion--;
@@ -363,8 +368,6 @@
 
         document.addEventListener('DOMContentLoaded', () => {
             initializeHiraganaGrid();
-            document.getElementById('submit-button').addEventListener('click', handleSubmit);
-            // submitBtn.removeEventListener('click'); // 削除
         });
     </script>
 </body>
