@@ -3,13 +3,13 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>ひらがな練習</title>
+    <title>謎解きタイムアタック</title>
     <style>
         body {
             margin: 0;
             padding: 0;
             font-family: Arial, sans-serif;
-            background-color: #f8f9fa;
+            background-color: #f9f9f9;
             display: flex;
             justify-content: center;
             align-items: center;
@@ -33,30 +33,35 @@
         #question-image {
             width: 100%;
             max-height: 200px;
-            object-fit: cover;
-            border-radius: 10px;
+            object-fit: contain;
         }
 
         #answer-input {
-            width: calc(100% - 40px);
+            width: calc(100% - 20px);
             padding: 10px;
-            margin-top: 10px;
             font-size: 16px;
             border-radius: 5px;
             border: 1px solid #ccc;
+            margin-top: 10px;
         }
 
         .button-group {
             display: flex;
-            justify-content: space-around;
+            justify-content: space-between;
             margin-top: 10px;
         }
 
         .button-group button {
-            padding: 10px 20px;
+            flex-grow: 1;
+            padding: 10px;
             font-size: 14px;
             border-radius: 5px;
             border: none;
+            margin-left: 5px; /* ボタン間のスペース */
+        }
+
+        .button-group button:first-child {
+            margin-left: 0; /* 最初のボタンの余白をなくす */
         }
 
         .button-submit {
@@ -72,9 +77,9 @@
         #hiragana-panel {
             display: grid;
             grid-template-columns: repeat(5, 1fr);
-            gap: 5px;
+            gap: 5px; /* ボタン間のスペース */
             margin-top: 15px;
-            padding: 15px;
+            padding-bottom: 15px; /* 下部余白 */
         }
 
         .hiragana-button {
@@ -85,10 +90,8 @@
             border: 1px solid #ccc; /* ボーダー */
         }
 
-        footer {
-            margin-top: 20px;
-            font-size: 12px;
-            color: #6c757d;
+        .hiragana-button.special {
+            background-color: #e9ecef; /* 特殊ボタン（小文字・濁点など）の背景色 */
         }
     </style>
 </head>
@@ -98,8 +101,8 @@
             <!-- 問題画像 -->
             <img id="question-image" src="https://dummyimage.com/300x200/ccc/fff" alt="問題画像">
             
-            <!-- 解答入力欄 -->
-            <input type="text" id="answer-input" placeholder="解答を入力" readonly>
+             <!-- 解答入力欄 -->
+             <input type="text" id="answer-input" placeholder="解答を入力" readonly>
             
              <!-- ボタン -->
              <div class="button-group">
@@ -110,9 +113,6 @@
 
          <!-- 五十音パネル -->
          <div id="hiragana-panel"></div>
-         
-         <!-- フッター -->
-         <footer>©️2025 ひらがな練習. All rights reserved.</footer>
      </div>
 
      <script>
@@ -125,10 +125,18 @@
              ["な", "に", "ぬ", "ね", "の"],
              ["は", "ひ", "ふ", "へ", "ほ"],
              ["ま", "み", "む", "め", "も"],
-             ["や", "", "ゆ", "", "よ"],
+             ["や", "",   "ゆ", "",   "よ"],
              ["ら", "り", "る", "れ", "ろ"],
-             ["わ", "", "", "", "を"],
-             ["ん", "", "", "", ""]
+             ["わ", "",   "",   "",   "を"],
+             ["ん", "",   "",   "",   ""]
+         ];
+
+         const specialKeys = [
+             { label: '小', className: 'special' },
+             { label: '゛', className: 'special' },
+             { label: '゜', className: 'special' },
+             { label: '-', className: 'special' },
+             { label: '×', className: 'special' }
          ];
 
          const hiraganaPanel = document.getElementById("hiragana-panel");
@@ -140,7 +148,7 @@
          hiragana.forEach(row => {
              row.forEach(char => {
                  const button = document.createElement("button");
-                 button.className = "hiragana-button";
+                 button.className = char === "" ? 'hiragana-button special' : 'hiragana-button';
                  button.textContent = char;
 
                  // 空白セルは無効化
@@ -159,18 +167,37 @@
              });
          });
 
-         // 戻るボタンの動作
-         document.querySelector(".button-back").addEventListener("click", () => {
-             currentAnswer = currentAnswer.slice(0, -1); // 最後の文字を削除
-             answerInput.value = currentAnswer; // 入力欄に反映
+         // 特殊キーを追加
+         specialKeys.forEach(key => {
+             const button = document.createElement("button");
+             button.className = `hiragana-button ${key.className}`;
+             button.textContent = key.label;
+
+             // 特殊キーの動作
+             button.addEventListener("click", () => {
+                 if (key.label === '×') {
+                     currentAnswer = ""; // 全クリア
+                 } else if (key.label === '-') {
+                     currentAnswer += "-"; // 長音記号
+                 } else if (key.label === '小') {
+                     if (currentAnswer.length > 0) {
+                         const lastChar = currentAnswer.slice(-1);
+                         currentAnswer = currentAnswer.slice(0, -1) + convertToSmall(lastChar);
+                     }
+                 }
+                 answerInput.value = currentAnswer; // 入力欄に反映
+             });
+
+             hiraganaPanel.appendChild(button);
          });
 
-         // リセットボタンの動作（送信ボタンクリック時）
-         document.querySelector(".button-submit").addEventListener("click", () => {
-             alert(`あなたの答えは「${currentAnswer}」です！`);
-             currentAnswer = ""; // 入力値をリセット
-             answerInput.value = ""; // 入力欄をクリア
-         });
+         // 小文字変換関数
+         function convertToSmall(char) {
+             const smallMap = { あ:"ぁ",い:"ぃ",う:"ぅ",え:"ぇ",お:"ぉ",
+                                や:"ゃ",ゆ:"ゅ",よ:"ょ",
+                                つ:"っ" };
+             return smallMap[char] || char; // 小文字変換できない場合はそのまま返す
+         }
      </script>
 </body>
 </html>
