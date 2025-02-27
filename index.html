@@ -2,195 +2,109 @@
 <html lang="ja">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, interactive-widget=resizes-content">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>謎解きタイムアタック</title>
     <style>
         * {
             box-sizing: border-box;
-            touch-action: manipulation;
         }
 
         body {
             margin: 0;
             padding: 10px;
-            background-color: #f0f4f8;
-            font-family: 'Arial', sans-serif;
-            position: fixed;
-            width: 100%;
-            height: 100%;
-            overflow: hidden;
+            font-family: Arial, sans-serif;
+            background-color: #f9f9f9;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
         }
 
         #game-container {
+            width: 100%;
             max-width: 600px;
-            margin: 0 auto;
-            height: 100%;
-            display: flex;
-            flex-direction: column;
+            background-color: #fff;
+            border-radius: 10px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
         }
 
-        .header {
-            padding: 10px;
-            background: #4a90e2;
+        #header {
+            background-color: #4a90e2;
             color: white;
-            border-radius: 8px 8px 0 0;
-        }
-
-        #timer {
-            font-size: 1.5em;
-            font-weight: bold;
+            text-align: center;
+            padding: 10px;
         }
 
         #question-area {
-            flex: 1;
-            background: white;
             padding: 15px;
-            overflow-y: auto;
+            text-align: center;
         }
 
         .question-image {
-            width: 100%;
+            width: 90%;
             max-height: 200px;
             object-fit: contain;
-            margin: 10px 0;
-        }
-
-        #input-area {
-            background: #e8f0fe;
-            padding: 10px;
-            border-radius: 0 0 8px 8px;
-        }
-
-        .input-panel {
-            display: grid;
-            grid-template-columns: repeat(5, 1fr);
-            gap: 3px;
-            margin-top: 10px;
-        }
-
-        .input-btn {
-            aspect-ratio: 1;
-            background: white;
-            border: 1px solid #ccc;
-            border-radius: 4px;
-            font-size: 14px;
-            touch-action: manipulation;
+            margin-bottom: 10px;
         }
 
         #answer-input {
-            width: 100%;
-            padding: 12px;
+            width: calc(100% - 20px);
+            padding: 10px;
             font-size: 16px;
-            border: 2px solid #4a90e2;
-            border-radius: 6px;
-            margin: 5px 0;
+            border-radius: 5px;
+            border: 1px solid #ccc;
         }
 
-        .control-buttons {
+        .button-group {
             display: flex;
-            gap: 5px;
+            justify-content: space-between;
             margin-top: 10px;
         }
 
-        .control-btn {
+        .button-group button {
             flex: 1;
-            padding: 12px;
-            background: #4a90e2;
+            padding: 10px;
+            margin-right: 5px; /* ボタン間の余白 */
+            font-size: 14px;
+            background-color: #4a90e2;
             color: white;
+            border-radius: 5px;
             border: none;
-            border-radius: 6px;
-            font-size: 16px;
+        }
+
+        .button-group button:last-child {
+            margin-right: 0; /* 最後のボタンの余白をなくす */
+        }
+
+        #hiragana-panel {
+            display: grid;
+            grid-template-columns: repeat(5, 1fr);
+            gap: 5px; /* ボタン間のスペース */
+            margin-top: 15px;
+        }
+
+        .hiragana-button {
+            aspect-ratio: 1; /* 正方形ボタン */
+            font-size: 14px; /* ボタン内文字サイズ */
+            background-color: white;
+            border-radius: 4px; /* ボタンの角丸 */
+            border: 1px solid #ccc; /* ボーダー */
         }
     </style>
 </head>
 <body>
     <div id="game-container">
-        <div class="header">
-            <div id="timer">TIME: 00:00</div>
+        <div id="header">
+            <h1>謎解きタイムアタック</h1>
         </div>
-        
+
         <div id="question-area">
             <img class="question-image" src="https://dummyimage.com/300x200/ccc/fff" alt="問題画像">
-            <p id="question-text">ここに問題文が表示されます</p>
-        </div>
-
-        <div id="input-area">
-            <input type="text" id="answer-input" placeholder="答えを入力" readonly>
-            <div class="input-panel" id="hiragana-panel"></div>
-            <div class="control-buttons">
-                <button class="control-btn" id="backspace">←</button>
-                <button class="control-btn" id="submit">回答</button>
-            </div>
-        </div>
-    </div>
-
-    <script>
-        // ひらがな入力パネルの設定
-        const hiragana = [
-            ['あ','い','う','え','お'],
-            ['か','き','く','け','こ'],
-            ['さ','し','す','せ','そ'],
-            ['た','ち','つ','て','と'],
-            ['な','に','ぬ','ね','の'],
-            ['は','ひ','ふ','へ','ほ'],
-            ['ま','み','む','め','も'],
-            ['や','','ゆ','','よ'],
-            ['ら','り','る','れ','ろ'],
-            ['わ','','を','','ん'],
-            ['゛','゜','小','ー','×']
-        ];
-
-        const panel = document.getElementById('hiragana-panel');
-        hiragana.forEach(row => {
-            row.forEach(char => {
-                const btn = document.createElement('button');
-                btn.className = 'input-btn';
-                btn.textContent = char;
-                btn.disabled = char === '';
-                btn.addEventListener('click', () => handleInput(char));
-                panel.appendChild(btn);
-            });
-        });
-
-        // 入力処理
-        const answerInput = document.getElementById('answer-input');
-        let currentInput = '';
-
-        function handleInput(char) {
-            if (char === '×') {
-                currentInput = '';
-            } else if (char === '小') {
-                // 小文字変換処理
-            } else {
-                currentInput += char;
-            }
-            answerInput.value = currentInput;
-        }
-
-        document.getElementById('backspace').addEventListener('click', () => {
-            currentInput = currentInput.slice(0, -1);
-            answerInput.value = currentInput;
-        });
-
-        // タイマー処理
-        let startTime;
-        let timer;
-        function updateTimer() {
-            const elapsed = Date.now() - startTime;
-            const minutes = Math.floor(elapsed / 60000);
-            const seconds = Math.floor((elapsed % 60000) / 1000);
-            document.getElementById('timer').textContent = 
-                `TIME: ${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;
-        }
-
-        // ゲーム開始処理
-        function startGame() {
-            startTime = Date.now();
-            timer = setInterval(updateTimer, 1000);
-        }
-
-        // 初期化
-        startGame();
-    </script>
-</body>
-</html>
+            
+             <!-- 問題文 -->
+             <p>ここに問題文が表示されます。</p>
+            
+             <!-- 回答入力欄 -->
+             <input type="text" id="answer-input" readonly placeholder="解答を入力">
+            
+             <!-- ボタン -->
