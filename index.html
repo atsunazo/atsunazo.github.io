@@ -15,7 +15,13 @@
             height: 100%;
             overflow: hidden;
         }
-        
+        #title-image {
+            width: 100%;
+            max-width: 315px;
+            height: auto;
+            margin-bottom: 15px;
+        }
+
         #quiz-container {
             background-color: white;
             max-width: 95%;
@@ -66,9 +72,11 @@
 <body>
     <div id="quiz-container">
         <div id="start-screen">
+            <img id="title-image" src="./0.png" alt="タイトル画像">
             <input type="text" id="name-input" placeholder="名前を入力してください">
             <button id="start-btn">開始</button>
         </div>
+
         <div id="quiz-screen" style="display: none;">
             <div id="timer">残り時間: 10:00</div>
             <div id="quiz-area">
