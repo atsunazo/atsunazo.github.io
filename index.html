@@ -103,14 +103,14 @@
         });
 
         const questions = [
-            { image: './1.png', answer: 'きのこ' },
-            { image: './2.png', answer: 'あいす' },
-            { image: './3.png', answer: 'だむ' },
-            { image: './4.png', answer: 'まえば' },
-            { image: './5.png', answer: 'からす' },
-            { image: './6.png', answer: 'よもぎ' },
-            { image: './7.png', answer: 'うに' },
-            { image: './8.png', answer: 'しりとり' },
+            { image: './1.png', answer: ['きのこ', 'キノコ'] },
+            { image: './2.png', answer: ['あいす', 'アイス'] },
+            { image: './3.png', answer: ['だむ', 'ダム'] },
+            { image: './4.png', answer: ['まえば', 'マエバ'] },
+            { image: './5.png', answer: ['からす', 'カラス'] },
+            { image: './6.png', answer: ['よもぎ', 'ヨモギ'] },
+            { image: './7.png', answer: ['うに', 'ウニ'] },
+            { image: './8.png', answer: ['しりとり', 'シリトリ'] },
         ];
 
         let currentQuestion = 0;
@@ -183,20 +183,20 @@
         }
 
         submitBtn.addEventListener('click', () => {
-            const userAnswer = answerInput.value.trim();
-            if (userAnswer === questions[currentQuestion].answer) {
-                answers[currentQuestion] = userAnswer;
-                solvedQuestions.add(currentQuestion);
-                currentQuestion++;
-                if (currentQuestion < questions.length) {
-                    showQuestion(currentQuestion);
-                } else {
-                    finishQuiz();
-                }
+          const userAnswer = answerInput.value.trim();
+          if (questions[currentQuestion].answer.includes(userAnswer)) {
+            answers[currentQuestion] = userAnswer;
+            solvedQuestions.add(currentQuestion);
+            currentQuestion++;
+            if (currentQuestion < questions.length) {
+              showQuestion(currentQuestion);
             } else {
-                resultMessage.textContent = '不正解';
-                resultMessage.className = 'incorrect';
+              finishQuiz();
             }
+          } else {
+            resultMessage.textContent = '不正解';
+            resultMessage.className = 'incorrect';
+          }
         });
 
         backBtn.addEventListener('click', () => {
