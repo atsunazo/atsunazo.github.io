@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, interactive-widget=resizes-content">
     <title>謎解きタイムアタック</title>
     <style>
-        input[type="text"], textarea {
+        input[type="text"] {
            font-size: 16px;
         }
 
@@ -18,8 +18,8 @@
         
         #quiz-container {
             background-color: white;
-            max-width: 90%;
-            width: 320px;
+            max-width: 95%;
+            width: 340px;
             margin: 0 auto;
             padding: 15px;
             border-radius: 10px;
@@ -34,7 +34,7 @@
             margin-bottom: 15px;
         }
 
-        input[type="text"], textarea {
+        input[type="text"] {
             width: 80%;
             padding: 10px;
             margin: 10px 0;
@@ -78,19 +78,19 @@
         </div>
         <div id="finish-screen" style="display: none;">
             <p id="finish-result"></p>
-            <textarea id="comment-input" placeholder="コメントを入力してください" rows="4"></textarea>
-            <button id="submit-comment-btn">送信</button>
+            <button id="restart-btn">もう一度プレイ</button>
         </div>
     </div>
 
     <script>
         window.addEventListener('resize', function() {
-            if (document.activeElement.tagName === 'INPUT' || document.activeElement.tagName === 'TEXTAREA') {
+            if (document.activeElement.tagName === 'INPUT') {
                 window.setTimeout(function() {
-            document.activeElement.scrollIntoView();
+                    document.activeElement.scrollIntoView();
                 }, 0);
             }
         });
+
         const questions = [
             { image: './1.png', text: '問題1のテキスト', answer: 'きのこ' },
             { image: './2.png', text: '問題2のテキスト', answer: 'あいす' },
@@ -123,46 +123,7 @@
         const resultMessage = document.getElementById('result-message');
         const timerDisplay = document.getElementById('timer');
         const finishResult = document.getElementById('finish-result');
-        const commentInput = document.getElementById('comment-input');
-        const submitCommentBtn = document.getElementById('submit-comment-btn');
-
-        function saveRecord(name, time, rank) {
-            var gasUrl = "https://script.google.com/macros/s/AKfycbz6mVCgN0sI-EAVAcdHLbpWpe2MxF-HZCeziijRJCHV7vQW-QnvzCwuhxeDXkhCG1nrPw/exec";
-
-            fetch(gasUrl, {
-                method: 'POST',
-                mode: 'no-cors',
-                headers: {
-                'Content-Type': 'application/json'
-                },
-                body: JSON.stringify({
-                action: 'saveRecord',
-                name: name,
-                time: time,
-                rank: rank
-                })
-            })
-            .then(response => {
-                console.log('記録が保存されました:');
-            })
-            .catch(error => console.error('記録の保存に失敗しました:', error));
-        }
-
-        function displayLeaderboard() {
-            var gasUrl = "YOUR_GAS_URL";
-
-            fetch(gasUrl + "?action=getLeaderboard")
-                .then(response => response.json())
-                .then(data => {
-                    const leaderboardList = document.getElementById('leaderboard-list');
-                    leaderboardList.innerHTML = data.map((entry, index) => {
-                        return `<li>${entry.name} - ${entry.time} (${entry.rank})</li>`;
-                    }).join('');
-                })
-                .catch(error => console.error('ランキングの取得に失敗しました:', error));
-        }
-
-        window.addEventListener('load', displayLeaderboard);
+        const restartBtn = document.getElementById('restart-btn');
 
         startBtn.addEventListener('click', () => {
             playerName = nameInput.value.trim();
@@ -217,7 +178,7 @@
                     finishQuiz();
                 }
             } else {
-                resultMessage.textContent = '違います。もう一度試してください。';
+                resultMessage.textContent = '不正解';
             }
         });
 
@@ -250,27 +211,16 @@
                 <p>タイム: ${finalTime}</p>
                 <p class="rank">ランク: ${rank}</p>
             `;
-            saveRecord(playerName, finalTime, rank);
         }
 
-        submitCommentBtn.addEventListener('click', () => {
-            const comment = commentInput.value.trim();
-            if (comment) {
-                console.log('記録されたコメント:', comment);
-                resetQuiz();
-            } else {
-                alert('コメントを入力してください。');
-            }
-        });
+        restartBtn.addEventListener('click', resetQuiz);
 
         function resetQuiz() {
             currentQuestion = 0;
             answers = [];
             solvedQuestions.clear();
-            commentInput.value = '';
             finishScreen.style.display = 'none';
             startScreen.style.display = 'block';
-            displayLeaderboard();
         }
     </script>
 </body>
