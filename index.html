@@ -5,14 +5,17 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, interactive-widget=resizes-content">
     <title>謎解きタイムアタック</title>
     <style>
+        input[type="text"] {
+           font-size: 16px;
+        }
+
         body {
             position: fixed;
             width: 100%;
             height: 100%;
-            margin: 0;
             overflow: hidden;
         }
-
+        
         #quiz-container {
             background-color: white;
             max-width: 95%;
@@ -24,16 +27,9 @@
             text-align: center;
         }
 
-        #title-image {
-            width: 100%;
-            max-width: 315px;
-            height: auto;
-            margin-bottom: 15px;
-        }
-
         #question-image {
-            width: 315px;
-            height: 222px;
+            width: 346px;
+            height: 244px;
             object-fit: cover;
             margin-bottom: 15px;
         }
@@ -70,7 +66,6 @@
 <body>
     <div id="quiz-container">
         <div id="start-screen">
-            <img id="title-image" src="./0.png" alt="タイトル画像">
             <input type="text" id="name-input" placeholder="名前を入力してください">
             <button id="start-btn">開始</button>
         </div>
@@ -91,49 +86,155 @@
     </div>
 
     <script>
-        // スクロール位置をリセットして画面固定
-        document.addEventListener('focusin', (e) => {
-            if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') {
-                document.body.style.position = 'fixed';
-                document.body.style.top = `-${window.scrollY}px`;
-                document.body.style.width = '100%';
-                document.body.style.height = '100%';
-                document.body.style.overflow = 'hidden';
+        window.addEventListener('resize', function() {
+            if (document.activeElement.tagName === 'INPUT') {
+                window.setTimeout(function() {
+                    document.activeElement.scrollIntoView();
+                }, 0);
             }
         });
 
-        document.addEventListener('focusout', () => {
-            const scrollY = document.body.style.top ? parseInt(document.body.style.top.replace('px', ''), 10) : 0;
-            document.body.style.position = '';
-            document.body.style.top = '';
-            document.body.style.width = '';
-            document.body.style.height = '';
-            document.body.style.overflow = '';
-            
-            window.scrollTo(0, -scrollY);
-        });
-
-        // クイズ関連のコード（省略せず記載）
         const questions = [
             { image: './1.png', answer: 'きのこ' },
             { image: './2.png', answer: 'あいす' },
             { image: './3.png', answer: 'だむ' },
+            { image: './4.png', answer: 'まえば' },
+            { image: './5.png', answer: 'からす' },
+            { image: './6.png', answer: 'よもぎ' },
+            { image: './7.png', answer: 'うに' },
+            { image: './8.png', answer: 'しりとり' },
         ];
 
         let currentQuestion = 0;
-        let remainingTime = 600; // 秒数（10分）
-        
-        const startBtn = document.getElementById('start-btn');
+        let startTime;
+        let timerInterval;
+        let answers = [];
+        let solvedQuestions = new Set();
+        let playerName = '';
+        let remainingTime = 600; // 10分 = 600秒
+
+        const startScreen = document.getElementById('start-screen');
+        const quizScreen = document.getElementById('quiz-screen');
+        const finishScreen = document.getElementById('finish-screen');
         const nameInput = document.getElementById('name-input');
-        
+        const startBtn = document.getElementById('start-btn');
+        const quizArea = document.getElementById('quiz-area');
+        const questionImage = document.getElementById('question-image');
+        const answerInput = document.getElementById('answer-input');
+        const submitBtn = document.getElementById('submit-btn');
+        const backBtn = document.getElementById('back-btn');
+        const resultMessage = document.getElementById('result-message');
+        const timerDisplay = document.getElementById('timer');
+        const finishResult = document.getElementById('finish-result');
+        const restartBtn = document.getElementById('restart-btn');
+
         startBtn.addEventListener('click', () => {
-          const playerName = nameInput.value.trim();
-          if (playerName) {
-              alert(`ようこそ、${playerName}さん！`);
-          } else {
-              alert('名前を入力してください。');
-          }
+            playerName = nameInput.value.trim();
+            if (playerName) {
+                startScreen.style.display = 'none';
+                quizScreen.style.display = 'block';
+                startQuiz();
+            } else {
+                alert('名前を入力してください。');
+            }
         });
+
+        function startQuiz() {
+            startTime = new Date().getTime();
+            timerInterval = setInterval(updateTimer, 1000);
+            showQuestion(currentQuestion);
+        }
+
+        function showQuestion(index) {
+            const question = questions[index];
+            questionImage.src = question.image;
+            
+            if (solvedQuestions.has(index)) {
+                answerInput.value = answers[index];
+                answerInput.disabled = true;
+                resultMessage.textContent = '正解済み';
+                resultMessage.className = '';
+            } else {
+                answerInput.value = '';
+                answerInput.disabled = false;
+                resultMessage.textContent = '';
+                resultMessage.className = '';
+            }
+        }
+
+        function updateTimer() {
+            remainingTime--;
+            if (remainingTime <= 0) {
+                clearInterval(timerInterval);
+                finishQuiz();
+            } else {
+                const minutes = Math.floor(remainingTime / 60);
+                const seconds = remainingTime % 60;
+                timerDisplay.textContent = `残り時間: ${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+            }
+        }
+
+        submitBtn.addEventListener('click', () => {
+            const userAnswer = answerInput.value.trim();
+            if (userAnswer === questions[currentQuestion].answer) {
+                answers[currentQuestion] = userAnswer;
+                solvedQuestions.add(currentQuestion);
+                currentQuestion++;
+                if (currentQuestion < questions.length) {
+                    showQuestion(currentQuestion);
+                } else {
+                    finishQuiz();
+                }
+            } else {
+                resultMessage.textContent = '不正解';
+                resultMessage.className = 'incorrect';
+            }
+        });
+
+        backBtn.addEventListener('click', () => {
+            if (currentQuestion > 0) {
+                currentQuestion--;
+                showQuestion(currentQuestion);
+            }
+        });
+
+        function getRank(time) {
+            const elapsedSeconds = 600 - time; // 経過時間を秒単位で計算
+            
+            if (elapsedSeconds <= 120) return 'S';
+            if (elapsedSeconds <= 240) return 'A';
+            if (elapsedSeconds <= 360) return 'B';
+            if (elapsedSeconds <= 480) return 'C';
+            return 'D';
+        }
+
+        function finishQuiz() {
+            clearInterval(timerInterval);
+            const elapsedTime = 600 - remainingTime; // 経過時間を計算
+            const minutes = Math.floor(elapsedTime / 60);
+            const seconds = elapsedTime % 60;
+            const finalTime = `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+            const rank = getRank(remainingTime);
+            
+            quizScreen.style.display = 'none';
+            finishScreen.style.display = 'block';
+            finishResult.innerHTML = `
+                <p>名前: ${playerName}</p>
+                <p>タイム: ${finalTime}</p>
+                <p class="rank">ランク: ${rank}</p>
+            `;
+        }
+
+        restartBtn.addEventListener('click', resetQuiz);
+
+        function resetQuiz() {
+            currentQuestion = 0;
+            answers = [];
+            solvedQuestions.clear();
+            remainingTime = 600;
+            finishScreen.style.display = 'none';
+            startScreen.style.display = 'block';
+        }
     </script>
 </body>
 </html>
