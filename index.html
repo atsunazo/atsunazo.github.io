@@ -138,14 +138,14 @@
 
         startBtn.addEventListener('click', () => {
             playerName = nameInput.value.trim();
-            if (playerName) {
-                startScreen.style.display = 'none';
-                quizScreen.style.display = 'block';
-                startQuiz();
-            } else {
-                alert('名前を入力してください。');
+            if (!playerName) {
+                playerName = 'ななし';
             }
+            startScreen.style.display = 'none';
+            quizScreen.style.display = 'block';
+            startQuiz();
         });
+
 
         function startQuiz() {
             startTime = new Date().getTime();
