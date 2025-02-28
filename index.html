@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, interactive-widget=resizes-content">
-    <title>謎解きタイムアタック</title>
+    <title>謎解き１</title>
     <style>
         input[type="text"] {
            font-size: 16px;
@@ -216,12 +216,24 @@
             return 'D';
         }
 
-        function finishQuiz() {
+        function updateTimer() {
+            remainingTime--;
+            if (remainingTime <= 0) {
+                clearInterval(timerInterval);
+                finishQuiz(true);
+            } else {
+                const minutes = Math.floor(remainingTime / 60);
+                const seconds = remainingTime % 60;
+                timerDisplay.textContent = `残り時間: ${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+            }
+        }
+        
+        function finishQuiz(isTimeUp = false) {
             clearInterval(timerInterval);
-            const elapsedTime = 600 - remainingTime; // 経過時間を計算
+            const elapsedTime = 600 - remainingTime;
             const minutes = Math.floor(elapsedTime / 60);
             const seconds = elapsedTime % 60;
-            const finalTime = `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+            const finalTime = isTimeUp ? "時間切れ" : `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
             const rank = getRank(remainingTime);
             
             quizScreen.style.display = 'none';
@@ -232,6 +244,7 @@
                 <p class="rank">ランク: ${rank}</p>
             `;
         }
+
 
         restartBtn.addEventListener('click', resetQuiz);
 
