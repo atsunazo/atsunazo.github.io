@@ -207,7 +207,7 @@
               finishQuiz();
             }
           } else {
-            resultMessage.textContent = 'ちがいます';
+            resultMessage.textContent = 'ちがうよ';
             resultMessage.className = 'incorrect';
           }
         });
@@ -222,11 +222,11 @@
         function getRank(time) {
             const elapsedSeconds = TIME_LIMIT - time;
             
-            if (elapsedSeconds <= TIME_LIMIT * 0.2) return 'S';
-            if (elapsedSeconds <= TIME_LIMIT * 0.4) return 'A';
-            if (elapsedSeconds <= TIME_LIMIT * 0.6) return 'B';
-            if (elapsedSeconds <= TIME_LIMIT * 0.8) return 'C';
-            return 'D';
+            if (elapsedSeconds <= TIME_LIMIT * 0.2) return 'SS';
+            if (elapsedSeconds <= TIME_LIMIT * 0.4) return 'S';
+            if (elapsedSeconds <= TIME_LIMIT * 0.6) return 'A';
+            if (elapsedSeconds <= TIME_LIMIT * 0.8) return 'B';
+            return 'C';
         }
         
         function finishQuiz(isTimeUp = false) {
