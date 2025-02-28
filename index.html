@@ -94,6 +94,9 @@
     </div>
 
     <script>
+        // 制限時間を設定（秒単位）
+        const TIME_LIMIT = 600; // 10分 = 600秒
+
         window.addEventListener('resize', function() {
             if (document.activeElement.tagName === 'INPUT') {
                 window.setTimeout(function() {
@@ -119,7 +122,7 @@
         let answers = [];
         let solvedQuestions = new Set();
         let playerName = '';
-        let remainingTime = 600; // 10分 = 600秒
+        let remainingTime = TIME_LIMIT;
 
         const startScreen = document.getElementById('start-screen');
         const quizScreen = document.getElementById('quiz-screen');
@@ -145,7 +148,6 @@
             quizScreen.style.display = 'block';
             startQuiz();
         });
-
 
         function startQuiz() {
             startTime = new Date().getTime();
@@ -174,7 +176,7 @@
             remainingTime--;
             if (remainingTime <= 0) {
                 clearInterval(timerInterval);
-                finishQuiz();
+                finishQuiz(true);
             } else {
                 const minutes = Math.floor(remainingTime / 60);
                 const seconds = remainingTime % 60;
@@ -207,30 +209,18 @@
         });
 
         function getRank(time) {
-            const elapsedSeconds = 600 - time; // 経過時間を秒単位で計算
+            const elapsedSeconds = TIME_LIMIT - time;
             
-            if (elapsedSeconds <= 120) return 'S';
-            if (elapsedSeconds <= 240) return 'A';
-            if (elapsedSeconds <= 360) return 'B';
-            if (elapsedSeconds <= 480) return 'C';
+            if (elapsedSeconds <= TIME_LIMIT * 0.2) return 'S';
+            if (elapsedSeconds <= TIME_LIMIT * 0.4) return 'A';
+            if (elapsedSeconds <= TIME_LIMIT * 0.6) return 'B';
+            if (elapsedSeconds <= TIME_LIMIT * 0.8) return 'C';
             return 'D';
-        }
-
-        function updateTimer() {
-            remainingTime--;
-            if (remainingTime <= 0) {
-                clearInterval(timerInterval);
-                finishQuiz(true);
-            } else {
-                const minutes = Math.floor(remainingTime / 60);
-                const seconds = remainingTime % 60;
-                timerDisplay.textContent = `残り時間: ${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
-            }
         }
         
         function finishQuiz(isTimeUp = false) {
             clearInterval(timerInterval);
-            const elapsedTime = 600 - remainingTime;
+            const elapsedTime = TIME_LIMIT - remainingTime;
             const minutes = Math.floor(elapsedTime / 60);
             const seconds = elapsedTime % 60;
             const finalTime = isTimeUp ? "時間切れ" : `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
@@ -245,14 +235,13 @@
             `;
         }
 
-
         restartBtn.addEventListener('click', resetQuiz);
 
         function resetQuiz() {
             currentQuestion = 0;
             answers = [];
             solvedQuestions.clear();
-            remainingTime = 600;
+            remainingTime = TIME_LIMIT;
             finishScreen.style.display = 'none';
             startScreen.style.display = 'block';
         }
