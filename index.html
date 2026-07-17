@@ -4,37 +4,27 @@
     <meta charset="UTF-8">
     <meta
         name="viewport"
-        content="width=device-width, initial-scale=1.0, interactive-widget=overlays-content"
+        content="width=device-width, initial-scale=1.0, interactive-widget=resizes-content"
     >
     <title>謎解き１</title>
 
     <style>
-        :root {
-            --blue: #1769e0;
-            --blue-dark: #0f55b8;
-            --gray: #66717d;
-            --red: #c62828;
-            --border: #bcc5d0;
-            --bg: #f2f5f9;
-        }
-
         * {
             box-sizing: border-box;
         }
 
         html {
             min-height: 100%;
-            background: var(--bg);
         }
 
         body {
             margin: 0;
             min-width: 0;
-            min-height: 100%;
+            min-height: 100dvh;
             overflow-x: hidden;
             overflow-y: auto;
-            background: var(--bg);
-            color: #1d2630;
+            background: #f3f6fb;
+            color: #222;
             font-family:
                 -apple-system,
                 BlinkMacSystemFont,
@@ -42,20 +32,17 @@
                 "Hiragino Kaku Gothic ProN",
                 "Noto Sans JP",
                 sans-serif;
-            -webkit-text-size-adjust: 100%;
-            text-size-adjust: 100%;
         }
 
         #quiz-container {
-            width: 100%;
-            max-width: 480px;
-            min-height: 100svh;
+            width: min(100%, 480px);
+            min-height: 100dvh;
             margin: 0 auto;
             padding:
-                max(16px, env(safe-area-inset-top))
+                max(20px, env(safe-area-inset-top))
                 16px
-                max(20px, env(safe-area-inset-bottom));
-            background: #fff;
+                max(24px, env(safe-area-inset-bottom));
+            background-color: #fff;
             text-align: center;
         }
 
@@ -69,13 +56,12 @@
             display: block;
             width: min(100%, 380px);
             height: auto;
-            margin: 8px auto 24px;
+            margin: 12px auto 24px;
         }
 
         #timer {
             margin: 4px 0 16px;
-            color: #34404d;
-            font-size: 16px;
+            color: #444;
             font-weight: 700;
             font-variant-numeric: tabular-nums;
         }
@@ -89,7 +75,7 @@
             width: 100%;
             max-width: 346px;
             height: auto;
-            max-height: 42svh;
+            max-height: 48dvh;
             margin: 0 auto 16px;
             object-fit: contain;
             border-radius: 8px;
@@ -98,62 +84,48 @@
         input[type="text"] {
             display: block;
             width: 100%;
-            min-height: 52px;
-            margin: 12px 0;
+            min-height: 48px;
+            margin: 12px auto;
             padding: 12px 14px;
-            border: 2px solid var(--border);
-            border-radius: 10px;
-            outline: none;
+            border: 1px solid #b8c1cc;
+            border-radius: 8px;
             background: #fff;
-            color: #1d2630;
-            font: inherit;
+            color: #222;
             font-size: 16px;
-            line-height: 24px;
-            -webkit-appearance: none;
-            appearance: none;
+            line-height: 1.4;
         }
 
         input[type="text"]:focus {
-            border-color: var(--blue);
-            box-shadow: 0 0 0 3px rgba(23, 105, 224, 0.18);
+            outline: 3px solid rgba(42, 116, 255, 0.28);
+            border-color: #2a74ff;
         }
 
         input[type="text"]:disabled {
-            background: #f0f2f5;
-            color: #56616d;
+            background: #eef1f4;
+            color: #555;
         }
 
         button {
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            min-height: 52px;
-            margin: 0;
-            padding: 0 16px;
+            min-width: 112px;
+            min-height: 48px;
+            margin: 4px;
+            padding: 10px 18px;
             border: 0;
-            border-radius: 10px;
-            background: var(--blue);
+            border-radius: 8px;
+            background: #1769e0;
             color: #fff;
             cursor: pointer;
-            font: inherit;
             font-size: 16px;
             font-weight: 700;
-            line-height: 1;
-            text-align: center;
-            white-space: nowrap;
-            -webkit-appearance: none;
-            appearance: none;
             touch-action: manipulation;
-            -webkit-tap-highlight-color: transparent;
         }
 
-        button:active:not(:disabled) {
-            background: var(--blue-dark);
+        button:active {
             transform: scale(0.98);
         }
 
         button:focus-visible {
-            outline: 3px solid rgba(23, 105, 224, 0.4);
+            outline: 3px solid rgba(42, 116, 255, 0.4);
             outline-offset: 2px;
         }
 
@@ -162,53 +134,37 @@
             opacity: 0.5;
         }
 
-        #start-btn,
-        #restart-btn {
-            width: min(100%, 180px);
-            margin-top: 4px;
+        #back-btn {
+            background: #68717c;
         }
 
         .button-row {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 10px;
-            width: 100%;
+            display: flex;
+            gap: 8px;
+            justify-content: center;
             margin-top: 8px;
         }
 
         .button-row button {
-            width: 100%;
-        }
-
-        #back-btn {
-            background: var(--gray);
-        }
-
-        #back-btn:active:not(:disabled) {
-            background: #4f5963;
+            flex: 1;
+            max-width: 180px;
+            margin: 0;
         }
 
         #result-message {
-            min-height: 24px;
-            margin: 12px 0 0;
-            font-size: 16px;
+            min-height: 1.5em;
+            margin: 12px 0 4px;
             font-weight: 700;
-            line-height: 24px;
-        }
-
-        .incorrect {
-            color: var(--red);
-        }
-
-        #finish-result {
-            margin: 32px 0 20px;
-            font-size: 17px;
         }
 
         .rank {
-            margin: 16px 0;
+            margin-top: 12px;
             font-size: 28px;
             font-weight: 800;
+        }
+
+        .incorrect {
+            color: #c62828;
         }
 
         @media (max-width: 360px) {
@@ -217,8 +173,8 @@
                 padding-left: 12px;
             }
 
-            #question-image {
-                max-height: 38svh;
+            button {
+                min-width: 96px;
             }
         }
     </style>
@@ -234,7 +190,6 @@
                 id="name-input"
                 placeholder="名前を入力してください"
                 autocomplete="name"
-                enterkeyhint="go"
             >
 
             <button id="start-btn" type="button">開始</button>
@@ -244,7 +199,7 @@
             <div id="timer" aria-live="polite">残り時間: 10:00</div>
 
             <div id="quiz-area">
-                <img id="question-image" src="" alt="">
+                <img id="question-image" src="" alt="問題画像">
             </div>
 
             <input
@@ -252,8 +207,6 @@
                 id="answer-input"
                 placeholder="回答を入力"
                 autocomplete="off"
-                autocapitalize="off"
-                spellcheck="false"
                 enterkeyhint="done"
             >
 
@@ -272,14 +225,6 @@
     </main>
 
     <script>
-        /*
-         * 対応ブラウザでは、キーボード表示時に
-         * ページの表示領域を縮めず、コンテンツへ重ねる。
-         */
-        if ("virtualKeyboard" in navigator) {
-            navigator.virtualKeyboard.overlaysContent = true;
-        }
-
         const TIME_LIMIT = 600;
 
         const questions = [
@@ -294,7 +239,7 @@
         ];
 
         let currentQuestion = 0;
-        let timerInterval = null;
+        let timerInterval;
         let answers = [];
         let solvedQuestions = new Set();
         let playerName = "";
@@ -318,41 +263,29 @@
         const finishResult = document.getElementById("finish-result");
         const restartBtn = document.getElementById("restart-btn");
 
-        startBtn.addEventListener("click", startGame);
+        startBtn.addEventListener("click", () => {
+            playerName = nameInput.value.trim() || "ななし";
+
+            startScreen.style.display = "none";
+            quizScreen.style.display = "block";
+
+            startQuiz();
+        });
 
         nameInput.addEventListener("keydown", (event) => {
             if (event.key === "Enter") {
-                startGame();
+                startBtn.click();
             }
         });
 
         answerInput.addEventListener("keydown", (event) => {
             if (event.key === "Enter" && !answerInput.disabled) {
-                submitAnswer();
+                submitBtn.click();
             }
         });
 
-        submitBtn.addEventListener("click", submitAnswer);
-
-        backBtn.addEventListener("click", () => {
-            if (currentQuestion > 0) {
-                currentQuestion--;
-                showQuestion(currentQuestion);
-            }
-        });
-
-        restartBtn.addEventListener("click", resetQuiz);
-
-        function startGame() {
-            playerName = nameInput.value.trim() || "ななし";
-
-            startScreen.style.display = "none";
-            finishScreen.style.display = "none";
-            quizScreen.style.display = "block";
-
-            currentQuestion = 0;
+        function startQuiz() {
             remainingTime = TIME_LIMIT;
-
             updateTimerDisplay();
             showQuestion(currentQuestion);
 
@@ -372,39 +305,20 @@
                 answerInput.value = answers[index];
                 answerInput.disabled = true;
                 submitBtn.disabled = true;
+
                 resultMessage.textContent = "正解済み";
                 resultMessage.className = "";
             } else {
                 answerInput.value = "";
                 answerInput.disabled = false;
                 submitBtn.disabled = false;
+
                 resultMessage.textContent = "";
                 resultMessage.className = "";
-            }
-        }
 
-        function submitAnswer() {
-            if (answerInput.disabled) {
-                return;
-            }
-
-            const userAnswer = answerInput.value.trim();
-            const correctAnswers = questions[currentQuestion].answer;
-
-            if (correctAnswers.includes(userAnswer)) {
-                answers[currentQuestion] = userAnswer;
-                solvedQuestions.add(currentQuestion);
-
-                currentQuestion++;
-
-                if (currentQuestion < questions.length) {
-                    showQuestion(currentQuestion);
-                } else {
-                    finishQuiz(false);
-                }
-            } else {
-                resultMessage.textContent = "ちがうよ";
-                resultMessage.className = "incorrect";
+                setTimeout(() => {
+                    answerInput.focus();
+                }, 100);
             }
         }
 
@@ -414,6 +328,7 @@
             if (remainingTime <= 0) {
                 remainingTime = 0;
                 updateTimerDisplay();
+                clearInterval(timerInterval);
                 finishQuiz(true);
                 return;
             }
@@ -426,8 +341,36 @@
             const seconds = remainingTime % 60;
 
             timerDisplay.textContent =
-                `残り時間: ${String(minutes).padStart(2, "0")}:${String(seconds).padStart(2, "0")}`;
+                `残り時間: ${minutes.toString().padStart(2, "0")}:${seconds.toString().padStart(2, "0")}`;
         }
+
+        submitBtn.addEventListener("click", () => {
+            const userAnswer = answerInput.value.trim();
+
+            if (questions[currentQuestion].answer.includes(userAnswer)) {
+                answers[currentQuestion] = userAnswer;
+                solvedQuestions.add(currentQuestion);
+
+                currentQuestion++;
+
+                if (currentQuestion < questions.length) {
+                    showQuestion(currentQuestion);
+                } else {
+                    finishQuiz();
+                }
+            } else {
+                resultMessage.textContent = "ちがうよ";
+                resultMessage.className = "incorrect";
+                answerInput.focus();
+            }
+        });
+
+        backBtn.addEventListener("click", () => {
+            if (currentQuestion > 0) {
+                currentQuestion--;
+                showQuestion(currentQuestion);
+            }
+        });
 
         function getRank(time) {
             const elapsedSeconds = TIME_LIMIT - time;
@@ -440,9 +383,8 @@
             return "C";
         }
 
-        function finishQuiz(isTimeUp) {
+        function finishQuiz(isTimeUp = false) {
             clearInterval(timerInterval);
-            timerInterval = null;
 
             const elapsedTime = TIME_LIMIT - remainingTime;
             const minutes = Math.floor(elapsedTime / 60);
@@ -450,7 +392,7 @@
 
             const finalTime = isTimeUp
                 ? "時間切れ"
-                : `${String(minutes).padStart(2, "0")}:${String(seconds).padStart(2, "0")}`;
+                : `${minutes.toString().padStart(2, "0")}:${seconds.toString().padStart(2, "0")}`;
 
             const rank = getRank(remainingTime);
 
@@ -466,22 +408,21 @@
 
         function resetQuiz() {
             clearInterval(timerInterval);
-            timerInterval = null;
 
             currentQuestion = 0;
             answers = [];
             solvedQuestions.clear();
-            playerName = "";
             remainingTime = TIME_LIMIT;
+            playerName = "";
 
             nameInput.value = "";
             answerInput.value = "";
             resultMessage.textContent = "";
-            resultMessage.className = "";
 
             finishScreen.style.display = "none";
-            quizScreen.style.display = "none";
             startScreen.style.display = "block";
+
+            nameInput.focus();
         }
 
         function escapeHtml(text) {
@@ -489,6 +430,8 @@
             div.textContent = text;
             return div.innerHTML;
         }
+
+        restartBtn.addEventListener("click", resetQuiz);
     </script>
 </body>
 </html>
