@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta
         name="viewport"
-        content="width=device-width, initial-scale=1.0, interactive-widget=resizes-content"
+        content="width=device-width, initial-scale=1.0, interactive-widget=overlays-content"
     >
     <title>謎解き１</title>
 
@@ -49,13 +49,13 @@
         #quiz-container {
             width: 100%;
             max-width: 480px;
-            min-height: 100dvh;
+            min-height: 100svh;
             margin: 0 auto;
             padding:
                 max(16px, env(safe-area-inset-top))
                 16px
                 max(20px, env(safe-area-inset-bottom));
-            background: #ffffff;
+            background: #fff;
             text-align: center;
         }
 
@@ -89,7 +89,7 @@
             width: 100%;
             max-width: 346px;
             height: auto;
-            max-height: 42dvh;
+            max-height: 42svh;
             margin: 0 auto 16px;
             object-fit: contain;
             border-radius: 8px;
@@ -153,7 +153,7 @@
         }
 
         button:focus-visible {
-            outline: 3px solid rgba(23, 105, 224, 0.35);
+            outline: 3px solid rgba(23, 105, 224, 0.4);
             outline-offset: 2px;
         }
 
@@ -200,15 +200,15 @@
             color: var(--red);
         }
 
+        #finish-result {
+            margin: 32px 0 20px;
+            font-size: 17px;
+        }
+
         .rank {
             margin: 16px 0;
             font-size: 28px;
             font-weight: 800;
-        }
-
-        #finish-result {
-            margin: 32px 0 20px;
-            font-size: 17px;
         }
 
         @media (max-width: 360px) {
@@ -218,7 +218,7 @@
             }
 
             #question-image {
-                max-height: 38dvh;
+                max-height: 38svh;
             }
         }
     </style>
@@ -272,6 +272,14 @@
     </main>
 
     <script>
+        /*
+         * 対応ブラウザでは、キーボード表示時に
+         * ページの表示領域を縮めず、コンテンツへ重ねる。
+         */
+        if ("virtualKeyboard" in navigator) {
+            navigator.virtualKeyboard.overlaysContent = true;
+        }
+
         const TIME_LIMIT = 600;
 
         const questions = [
